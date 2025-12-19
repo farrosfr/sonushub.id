@@ -36,7 +36,7 @@ try {
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {
         categories.map(category => (
-          <a href={`/kategori/${category.kategori}`} class="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-center">
+          <a href={`/katalog?kategori=${encodeURIComponent(category.kategori)}&min_price=&max_price=`} class="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-center">
             <h2 class="text-xl font-semibold text-gray-800">{category.kategori}</h2>
           </a>
         ))
