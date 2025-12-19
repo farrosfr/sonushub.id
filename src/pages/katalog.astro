@@ -2,8 +2,14 @@ gas---
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import FilterSidebar from '../components/FilterSidebar.astro';
+import Pagination from '../components/Pagination.astro';
 import { pool } from '../lib/db';
 import type { Product } from '../data/products';
+
+// --- Pagination Logic ---
+const PAGE_SIZE = 12;
+const page = parseInt(Astro.url.searchParams.get('page') || '1', 10);
+const offset = (page - 1) * PAGE_SIZE;
 
 // --- Logic untuk Filtering ---
 const searchParams = Astro.url.searchParams;
@@ -14,38 +20,55 @@ const minPrice = searchParams.get('min_price');
 const maxPrice = searchParams.get('max_price');
 
 let products: Product[] = [];
+let totalProducts = 0;
+let totalPages = 1;
 let error: string | null = null;
 
 try {
   let sql = 'SELECT id, name, price, imageUrl, description, slug, kategori, brand FROM products';
+  let countSql = 'SELECT COUNT(*) as count FROM products';
   const conditions: string[] = [];
   const params: (string | number | (string | number)[])[] = [];
+  const countParams: (string | number | (string | number)[])[] = [];
 
   if (categories.length > 0) {
     conditions.push('kategori IN (?)');
     params.push(categories);
+    countParams.push(categories);
   }
 
   if (brands.length > 0) {
     conditions.push('brand IN (?)');
     params.push(brands);
+    countParams.push(brands);
   }
 
   if (minPrice) {
     conditions.push('price >= ?');
     params.push(Number(minPrice));
+    countParams.push(Number(minPrice));
   }
 
   if (maxPrice) {
     conditions.push('price <= ?');
     params.push(Number(maxPrice));
+    countParams.push(Number(maxPrice));
   }
 
   if (conditions.length > 0) {
-    sql += ' WHERE ' + conditions.join(' AND ');
+    const whereClause = ' WHERE ' + conditions.join(' AND ');
+    sql += whereClause;
+    countSql += whereClause;
   }
 
-  sql += ' ORDER BY created_at DESC';
+  // Get total count
+  const [countRows] = await pool.query(countSql, countParams);
+  totalProducts = (countRows as any)[0].count;
+  totalPages = Math.ceil(totalProducts / PAGE_SIZE);
+
+  // Get paginated products
+  sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+  params.push(PAGE_SIZE, offset);
 
   const [rows] = await pool.query(sql, params);
   
@@ -97,6 +120,13 @@ try {
             ))
           }
         </div>
+
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          baseUrl={Astro.url.pathname}
+          searchParams={Astro.url.searchParams}
+        />
       </div>
     </div>
   </main>
