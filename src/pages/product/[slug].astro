@@ -55,6 +55,8 @@ if (product) {
     console.error('Error fetching related products:', e);
   }
 }
+const isExternalUrl = product.imageUrl && product.imageUrl.startsWith('http');
+const localImage = product.imageUrl && images[`/src/assets/placeholders/${product.imageUrl}`];
 ---
 
 <Layout title={product?.name || 'Detail Produk'}>
@@ -72,9 +74,11 @@ if (product) {
       {product && (
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            {product.imageUrl && images[`/src/assets/placeholders/${product.imageUrl}`] ? (
+            { isExternalUrl ? (
+              <img src={product.imageUrl} alt={`Gambar ${product.name}`} loading="lazy" class="w-full h-auto rounded-lg shadow-md" />
+            ) : localImage ? (
               <Image 
-                src={images[`/src/assets/placeholders/${product.imageUrl}`]()} 
+                src={localImage()} 
                 alt={`Gambar ${product.name}`} 
                 width={800} 
                 height={800} 

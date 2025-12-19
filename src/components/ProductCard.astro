@@ -15,13 +15,17 @@ const formattedPrice = new Intl.NumberFormat('id-ID', {
 }).format(product.price);
 
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/placeholders/*.{jpeg,jpg,png,gif,webp}');
+const isExternalUrl = product.imageUrl && product.imageUrl.startsWith('http');
+const localImage = product.imageUrl && images[`/src/assets/placeholders/${product.imageUrl}`];
 ---
 
 <div class="border rounded-lg shadow-md overflow-hidden bg-white dark:bg-gray-800 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300 flex flex-col">
   <a href={`/product/${product.slug}`}>
-    {product.imageUrl && images[`/src/assets/placeholders/${product.imageUrl}`] ? (
+    { isExternalUrl ? (
+      <img src={product.imageUrl} alt={`Gambar ${product.name}`} loading="lazy" class="w-full aspect-square object-cover" />
+    ) : localImage ? (
       <Image 
-        src={images[`/src/assets/placeholders/${product.imageUrl}`]()} 
+        src={localImage()} 
         alt={`Gambar ${product.name}`} 
         width={400} 
         height={400} 
