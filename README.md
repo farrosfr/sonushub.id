@@ -87,7 +87,8 @@ This is the primary table in the database, containing all product data.
 | `imageUrl`  | `VARCHAR(255)`| The URL path to the product's image.                         |
 | `slug`      | `VARCHAR(255)`| A URL-friendly slug for the product page (e.g., `kabel-nym-3x2-5mm`). |
 | `kategori`  | `VARCHAR(255)`| The category the product belongs to.                         |
-| `brand`     | `VARCHAR(255)`| The brand name of the product.                               |
+| `brand` | `VARCHAR(255)`| The brand name of the product.                               |
+| `unit`      | `VARCHAR(50)` | The unit of measurement for the product (e.g., 'm', 'pcs', 'pallet', 'panel'). |
 | `datasheetUrl`| `VARCHAR(255)`| (Planned) The URL path to the product's datasheet. Currently a placeholder. |
 | `created_at`| `TIMESTAMP`   | The timestamp when the product was added (defaults to `CURRENT_TIMESTAMP`). |
 

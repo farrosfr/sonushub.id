@@ -8,6 +8,7 @@ export interface Product {
   slug: string;
   kategori: string;
   brand: string;
+  unit?: string;
 }
 
 export const MOCK_PRODUCTS: Product[] = [

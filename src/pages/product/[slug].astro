@@ -18,7 +18,7 @@ let product: Product | null = null;
 let error: string | null = null;
 
 try {
-  const [rows] = await pool.query('SELECT id, name, price, imageUrl, description, slug, kategori, brand FROM products WHERE slug = ?', [slug]);
+  const [rows] = await pool.query('SELECT id, name, price, imageUrl, description, slug, kategori, brand, unit FROM products WHERE slug = ?', [slug]);
   const productResult = (rows as any[])[0];
 
   if (productResult) {
@@ -44,7 +44,7 @@ let relatedProducts: Product[] = [];
 if (product) {
   try {
     const [relatedRows] = await pool.query(
-      'SELECT id, name, price, imageUrl, description, slug, kategori, brand FROM products WHERE kategori = ? AND slug != ? ORDER BY created_at DESC LIMIT 4',
+      'SELECT id, name, price, imageUrl, description, slug, kategori, brand, unit FROM products WHERE kategori = ? AND slug != ? ORDER BY created_at DESC LIMIT 4',
       [product.kategori, product.slug]
     );
     relatedProducts = (relatedRows as any[]).map(row => ({
@@ -55,8 +55,8 @@ if (product) {
     console.error('Error fetching related products:', e);
   }
 }
-const isExternalUrl = product.imageUrl && product.imageUrl.startsWith('http');
-const localImage = product.imageUrl && images[`/src/assets/placeholders/${product.imageUrl}`];
+const isExternalUrl = product?.imageUrl?.startsWith('http') ?? false;
+const localImage = product?.imageUrl && images[`/src/assets/placeholders/${product.imageUrl}`];
 ---
 
 <Layout title={product?.name || 'Detail Produk'}>
@@ -100,7 +100,7 @@ const localImage = product.imageUrl && images[`/src/assets/placeholders/${produc
                 <a href={`/merk/${product.brand.toLowerCase().replace(/\s+/g, '-')}`} class="hover:underline">{product.brand}</a>
               </div>
             )}
-            <p class="text-2xl font-bold text-gray-800 dark:text-gray-100 my-4">{formattedPrice}</p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-gray-100 my-4">{formattedPrice}{product?.unit && <span class="text-lg font-normal text-gray-500 dark:text-gray-400">/ {product.unit}</span>}</p>
             <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mt-6 mb-2">Deskripsi Produk</h2>
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed" set:html={product.description}></p>
 
